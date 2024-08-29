@@ -1,4 +1,4 @@
-import math, time, sys, random, os
+import math, time, sys, random, os, threading
 
 ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
 BIGNUM = 3**3**8
@@ -19,19 +19,27 @@ colors = ["red", "green", "yellow", "blue", "magenta", "cyan", "white", "bright_
 
 random.seed(time.time() // (60 * 60 * 24))
 
-isPrime = lambda n:[n%i for i in range(1, math.ceil(n/2) + 1)].count(0)==1
-primes = (n for n in range(BIGNUM) if isPrime(n))
+isPrime = lambda n:n%2==1 and [n%i for i in range(1, math.ceil(n/2) + 1)].count(0)==1
+primes = (n for n in range(1, BIGNUM) if isPrime(n))
+
 
 if __name__ == "__main__":
-	nonInteractive = sys.argv.index("--find") if "--find" in sys.argv else -1
-	if nonInteractive > -1:
+	if "--scroll" in sys.argv:
+		os.system(f"python {" ".join([x for x in sys.argv if x != "--scroll"])}|less")
+		exit()
+
+
+	jumpMode = sys.argv.index("--find") if "--find" in sys.argv else -1
+	if jumpMode > -1:
 		next(primes)
-		index = eval(sys.argv[nonInteractive + 1])
+		index = eval(sys.argv[jumpMode + 1])
 		random.seed(index)
 		for _ in track(range(index - 1), f"Looking for the {ordinal(index)} prime"):
 			next(primes)
 		color = random.choice(colors)
-		console.print(f"[{color}]{next(primes)}[/{color}]")
+		console.print(f"The {ordinal(index)} prime number is [{color}]{next(primes)}[/{color}]")
+		time.sleep(3)
+		
 
 
 	out = []
@@ -45,11 +53,15 @@ if __name__ == "__main__":
 
 				out.append(f"[{color}]{p} [/{color}]")
 				
-				if ("--express" not in sys.argv):
-					time.sleep(0.1)
+				if ("--express" in sys.argv):
+					delay = 0
+				elif ("--fast" in sys.argv):
+					delay = 0.01
+				else:
+					delay = 0.1
+				time.sleep(delay)
 				
-				if len(out) > 6:
-					print('\x1b[2k\x1b[100D\x1b[1A')
+				if len(out) > 6:					
 					console.print("".join(out))
 					out = []
 					progress.update(task, advance=7, refresh=True)
