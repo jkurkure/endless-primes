@@ -6,7 +6,9 @@ BIGNUM = 3**3**8
 while True:
 	try:
 		from rich.console import Console
+		from rich.progress import track
 		from rich.progress import Progress
+		from rich.progress import TaskProgressColumn
 		break
 	except ModuleNotFoundError:
 		os.system("pip install rich")
@@ -35,13 +37,9 @@ if __name__ == "__main__":
 	out = []
 	color = random.choice(colors)
 	try:
-		with Progress(console=console, auto_refresh=False) as progress:
-			goalpost = 30
-			task = progress.add_task("Hunting primes", total=goalpost)
+		with Progress(*Progress.get_default_columns(), TaskProgressColumn(show_speed=True), console=console, auto_refresh=False) as progress:
+			task = progress.add_task("Hunting primes", total=None)
 			for p in primes:
-				if (goalpost < BIGNUM):
-					goalpost += 5
-
 				if ("--rainbow" in sys.argv):
 					color = random.choice(colors)
 
@@ -54,7 +52,7 @@ if __name__ == "__main__":
 					print('\x1b[2k\x1b[100D\x1b[1A')
 					console.print("".join(out))
 					out = []
-					progress.update(task, advance=7, refresh=True, total=goalpost)
+					progress.update(task, advance=7, refresh=True)
 
 	except KeyboardInterrupt:
 		console.print("".join(out))
