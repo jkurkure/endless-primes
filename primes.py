@@ -19,7 +19,7 @@ colors = ["red", "green", "yellow", "blue", "magenta", "cyan", "white", "bright_
 
 random.seed(time.time() // (60 * 60 * 24))
 
-isPrime = lambda n:n%2==1 and [n%i for i in range(1, math.ceil(n/2) + 1)].count(0)==1
+isPrime = lambda n:n==2 or (n%2==1 and 0 not in (n%i for i in range(2, math.ceil(n/2) + 1)))
 primes = (n for n in range(1, BIGNUM) if isPrime(n))
 
 
